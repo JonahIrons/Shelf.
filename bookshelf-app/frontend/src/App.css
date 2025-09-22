@@ -1,0 +1,102 @@
+/* CSS HEX */
+:root {
+  --bistre: #2c1b10ff;
+  --pearl: #efe2cbff;
+  --brown-sugar: #b86e4bff;
+  --moss-green: #607031ff;
+  --feldgrau: #4e5e53ff;
+  --dark-moss-green: rgb(55, 66, 29);
+
+  /* CSS HSL */
+  --bistre: hsla(24, 47%, 12%, 1);
+  --pearl: hsla(38, 53%, 87%, 1);
+  --brown-sugar: hsla(19, 43%, 51%, 1);
+  --moss-green: hsla(75, 39%, 42%, 1);
+  --feldgrau: hsla(139, 9%, 34%, 1);
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap');
+
+/* <weight>: Use a value from 100 to 900 */
+/* Example usage of Roboto Slab font */
+
+body, html, #root {
+  height: 100%;
+  margin: 0;
+  background-color: var(--bistre);
+}
+
+.roboto-slab-normal {
+  font-family: "Roboto Slab", serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.App {
+  text-align: center;
+  background-color: var(--bistre);
+}
+
+.title h1 {
+  background-color: var(--bistre);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 100px;
+  color: var(--moss-green);
+  font-family: "Roboto Slab", serif;
+  margin-bottom: 0;
+}
+
+.title::after {
+  content: "";
+  display: block;
+  height: 4px;
+  width: 350px;
+  margin-left: auto;
+  margin-right: auto;
+  background: #7b5e3b;
+  border-radius: 4px;
+  margin-top: -8px;
+}
+
+.App-list {
+  text-align: left;
+  justify-content: top;
+  align-items: center;
+  color: var(--pearl);
+  font-family: "Roboto Slab", serif;
+  flex-direction: column;
+  display: flex;
+}
+
+.title-subheader h2 {
+  background-color: var(--bistre);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 25px;
+  color: var(--pearl);
+  font-family: "Roboto Slab", serif;
+  margin-top: 10px;
+}
+
+.App-logo {
+  height: 100px;
+  pointer-events: none;
+  justify-content: center;
+  margin-top: 5px;
+}
+
+.search-bar-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 200px;
+  align-items: center;
+  margin-top: 50px;
+  margin-bottom: 20px;
+  color: var(--pearl);
+}
+
