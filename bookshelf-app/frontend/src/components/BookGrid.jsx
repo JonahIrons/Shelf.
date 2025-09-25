@@ -1,9 +1,17 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'
 import './BookGrid.css';
 
 export const BookGrid = ({ results }) => {
     // Show only the first 12 results for better grid layout
     const displayResults = results.slice(0, 12);
+
+    const navigate = useNavigate();
+
+    const handleClick = (book) => {
+        const encodedId = encodeURIComponent(book.id);
+        navigate(`/book/${encodedId}`, { state: { book: book } });
+    };
 
     return (
         <div className="book-grid-container">
@@ -12,7 +20,7 @@ export const BookGrid = ({ results }) => {
             </h3>
             <div className="book-grid">
                 {displayResults.map((book, index) => (
-                    <div key={book.id || index} className="book-card">
+                    <div key={book.id || index} className="book-card" onClick={() => handleClick(book)}>
                         <div className="book-cover">
                             {book.cover_url ? (
                                 <img 

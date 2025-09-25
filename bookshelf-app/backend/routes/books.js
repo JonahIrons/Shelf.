@@ -63,6 +63,7 @@ router.get('/search', async (req, res) => {
                     isbn: book.isbn ? (Array.isArray(book.isbn) ? book.isbn[0] : book.isbn) : '',
                     published_year: book.first_publish_year || null,
                     cover_url: book.cover_i ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg` : '',
+                    description: '', //Empty in search results, fill in for details page.
                     source: 'openlibrary'
                 }));
 
@@ -120,16 +121,51 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const book = mockBooks.find(b => b.id === parseInt(id));
+        const decodedID = decodeURIComponent(id);
         
-        if (!book) {
-            return res.status(404).json({ 
-                error: 'Book not found',
-                message: `No book found with ID ${id}`
-            });
+        // Check if local mock book (numeric ID)
+        if (!isNaN(decodedID)) {
+            const book = mockBooks.find(b => b.id === parseInt(decodedID));
+            if (book) {
+                return res.json({ book });
+            }
         }
         
-        res.json({ book });
+        // Check if it's an OpenLibrary book
+        if (decodedID.startsWith('ol_')) {
+            const openLibraryId = decodedID.replace('ol_', '');
+            
+            try {
+                // Fetch from OpenLibrary API
+                const response = await fetch(`https://openlibrary.org${openLibraryId}.json`);
+                const data = await response.json();
+                
+                // Fill in book object
+                const book = {
+                    id: id,
+                    title: data.title,
+                    author: data.authors ? data.authors[0].name : 'Unknown',
+                    isbn: data.isbn_10 || data.isbn_13 || '',
+                    published_year: data.first_publish_date ? parseInt(data.first_publish_date) : null,
+                    cover_url: data.covers ? `https://covers.openlibrary.org/b/id/${data.covers[0]}-M.jpg` : '',
+                    source: 'openlibrary'
+                };
+                
+                return res.json({ book });
+            } catch (openLibraryError) {
+                console.error('OpenLibrary fetch error:', openLibraryError);
+                return res.status(404).json({ 
+                    error: 'Book not found',
+                    message: `Failed to fetch book from OpenLibrary`
+                });
+            }
+        }
+        
+        res.status(404).json({ 
+            error: 'Book not found',
+            message: `No book found with ID ${id}`
+        });
+        
     } catch (error) {
         console.error('Get book error:', error);
         res.status(500).json({ 
