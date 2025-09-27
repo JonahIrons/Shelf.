@@ -21,6 +21,7 @@ export const BookDetail = () => {
             setLoading(false);
         } else {
             console.log('Fetching book from API with ID:', id);
+            
             // Fetch book data using id from URL, as direct fallback
             fetch(`http://localhost:3001/api/books/${id}`)
                 .then(response => response.json())
@@ -46,17 +47,21 @@ export const BookDetail = () => {
 
     return (
         <div className="book-detail">
-            <button onClick={() => navigate('/')}>Back to Search</button>
-
-            <div className="book-detail-cover">
-                <img src={book.cover_url} alt={"No cover available."} />
+            <div className="book-detail-button">
+                <button onClick={() => navigate('/')}>Back to Search</button>
             </div>
 
-            <div className="book-detail-info">
-                <h1>{book.title}</h1>
-                <p>{book.author}</p>
-                <p>{book.published_year}</p>
-                <p>{book.description}</p>
+            <div className="book-detail-container">
+                <div className="book-detail-cover">
+                    <img src={book.cover_url} alt={"No cover available."} />
+                </div>
+
+                <div className="book-detail-info">
+                    <h1>{book.title}</h1>
+                    <p>{book.author}</p>
+                    <p>{book.published_year}</p>
+                    <p>{book.description}</p>
+                </div>
             </div>
         </div>
     );
