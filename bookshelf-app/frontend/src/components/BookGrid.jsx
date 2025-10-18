@@ -8,9 +8,57 @@ export const BookGrid = ({ results }) => {
 
     const navigate = useNavigate();
 
-    const handleClick = (book) => {
-        const encodedId = encodeURIComponent(book.id);
-        navigate(`/book/${encodedId}`, { state: { book: book } });
+    const handleClick = async (book) => {
+        if (book.source === 'openlibrary' && !book.description) {
+            try {
+                const openLibraryId = book.id.replace('ol_', '');
+                const response = await fetch(`https://openlibrary.org${openLibraryId}.json`);
+                const data = await response.json();
+                
+
+                console.log("TESTING IF REACHED HERE ==================");
+
+
+                let description = '';
+                if (data.description) {
+                    if (typeof data.description === "string") {
+                        description = data.description;
+                    } else if (data.description.value) {
+                        description = data.description.value;
+                    }
+                }
+
+
+                // Remove reference links and "Contains" sections
+                if (description.includes('----------')) {
+                    description = description.split('----------')[0].trim();
+                }
+
+                if (description.includes('([source][1])')) {
+                    description = description.split('([source][1])')[0].trim();
+                }
+
+                // Update the result with the description
+                const updatedResult = {
+                    ...book,
+                    description: description || 'No description available'
+                };
+
+                console.log(updatedResult);
+                
+                const encodedId = encodeURIComponent(book.id);
+                navigate(`/book/${encodedId}`, { state: { book: updatedResult } });
+            } catch (error) {
+                console.error('Error fetching description:', error);
+                // Navigate anyway with the original result
+                const encodedId = encodeURIComponent(book.id);
+                navigate(`/book/${encodedId}`, { state: { book: book } });
+            }
+        } else {
+            // Navigate with existing data
+            const encodedId = encodeURIComponent(book.id);
+            navigate(`/book/${encodedId}`, { state: { book: book } });
+        }
     };
 
     return (

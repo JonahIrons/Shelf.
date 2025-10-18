@@ -17,6 +17,7 @@ export const BookDetail = () => {
         // Check for book data from navigation state
         if (location.state?.book) {
             console.log('Using book from navigation state:', location.state.book);
+
             setBook(location.state.book);
             setLoading(false);
         } else {
@@ -60,6 +61,7 @@ export const BookDetail = () => {
                     <h1>{book.title}</h1>
                     <p>{book.author}</p>
                     <p>{book.published_year}</p>
+                    <br></br>
                     <p>{book.description}</p>
                 </div>
             </div>
