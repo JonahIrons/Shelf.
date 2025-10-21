@@ -12,9 +12,11 @@ app.use(express.urlencoded({ extended: true }));
 
 // Import routes
 const booksRoutes = require('./routes/books');
+const authRoutes = require('./routes/auth');
 
 // API Routes
 app.use('/api/books', booksRoutes);
+app.use('/api/auth', authRoutes);
 
 // Basic route for testing
 app.get('/', (req, res) => {

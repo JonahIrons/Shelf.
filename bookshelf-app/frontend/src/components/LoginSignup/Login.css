@@ -26,6 +26,7 @@ h2 {
     width: 450px;
     border-radius: 5px;
     height: 30px;
+    margin-right: 8px;
     display: flex;
     align-items: center;
 }
@@ -34,6 +35,7 @@ h2 {
     color: var(--pearl);
     font-size: 20px;
     margin-bottom: 8px;
+    margin-left: 10px;
 }
 
 input::placeholder {
@@ -42,7 +44,7 @@ input::placeholder {
 }
 
 .login-container button {
-    background-color: var(--dark-moss-green);
+    background-color: var(--light-bistre);
     color: var(--pearl);
     border-radius: 5px;
     align-items: center;
@@ -52,7 +54,7 @@ input::placeholder {
 }
 
 .login-container button:hover {
-    background-color: var(--light-bistre);
+    background-color: var(--dark-moss-green);
     cursor: pointer;
     transition: 0.3s;
 }

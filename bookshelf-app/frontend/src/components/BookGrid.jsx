@@ -14,9 +14,6 @@ export const BookGrid = ({ results }) => {
                 const openLibraryId = book.id.replace('ol_', '');
                 const response = await fetch(`https://openlibrary.org${openLibraryId}.json`);
                 const data = await response.json();
-                
-
-                console.log("TESTING IF REACHED HERE ==================");
 
 
                 let description = '';
