@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const { checkConnection } = require('./config/db');
+const { createAllTable } = require('./utils/dbUtils');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -12,11 +14,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Import routes
 const booksRoutes = require('./routes/books');
-const authRoutes = require('./routes/auth');
 
 // API Routes
 app.use('/api/books', booksRoutes);
-app.use('/api/auth', authRoutes);
 
 // Basic route for testing
 app.get('/', (req, res) => {
@@ -42,9 +42,17 @@ app.get('/health', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
-  console.log(`📚 Bookshelf Backend API ready at http://localhost:${PORT}`);
+app.listen(PORT, async() => {
+  console.log(`Server is running on port ${PORT}`);
+  console.log(`Bookshelf Backend API ready at http://localhost:${PORT}`);
+
+  try {
+    await checkConnection();
+    await createAllTable(); //Auto-create tables on start (if not exists)
+  }
+  catch (error) {
+    console.log("Failed to initialize the database", error);
+  }
 });
 
 module.exports = app;
