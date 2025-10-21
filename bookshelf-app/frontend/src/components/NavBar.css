@@ -14,22 +14,25 @@
     padding: 0rem 2rem;
     background-color: var(--bistre);
     box-shadow: 0px 0px 8px #ddd;
+    height: 75px;
 }
 
 .nav-links {
     list-style: none;
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem;
 }
 
 .nav-links a {
     text-decoration: none;
     color: var(--pearl);
     font-weight: 500;
+    transition: 0.3s;
 }
 
 .nav-links a:hover {
     color: var(--moss-green);
+    transition: 0.3s;
 }
 
 .logo {

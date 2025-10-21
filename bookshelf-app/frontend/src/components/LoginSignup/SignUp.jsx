@@ -35,12 +35,11 @@ export const SignUp = () => {
                     Sign Up
                 </button>
             </form>
-            <p style={{ textAlign: "center" }}>
+            <p>
                 Already have an account?{" "}
                 <Link
                     to='/login'
                     className='toggle-link'
-                    style={{ color: "#007BFF", textDecoration: "underline"}}
                 >
                     Login
                 </Link>
