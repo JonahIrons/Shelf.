@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 export const SignUp = () => {
     const[formValues, setFormValues] = useState({
@@ -13,9 +15,25 @@ export const SignUp = () => {
         setFormValues({...formValues,[name]:value}); //Will preserve previous form values
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async(e) => {
         e.preventDefault();
         console.log(formValues);
+        try {
+            const response = await axios.post("http://localhost:3001/api/auth/register-user", formValues);
+            console.log(response, 'res');
+
+            toast.success(response.data.message);
+        }
+        catch (error) {
+            if (error.response) {
+                toast.error(error.response.data.message);
+            }
+            else {
+                toast.error("Server unavailable. Please try again later.")
+            }
+            
+            console.error('Error during registration:', error);
+        }
     }
 
 

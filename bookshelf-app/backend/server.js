@@ -1,8 +1,10 @@
-const express = require('express');
-const cors = require('cors');
-require('dotenv').config();
-const { checkConnection } = require('./config/db');
-const { createAllTable } = require('./utils/dbUtils');
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+dotenv.config();
+import { checkConnection } from './config/db.js';
+import { createAllTable } from './utils/dbUtils.js';
+import authRoutes from './routes/authRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -13,10 +15,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Import routes
-const booksRoutes = require('./routes/books');
+import booksRoutes from './routes/books.js';
 
 // API Routes
 app.use('/api/books', booksRoutes);
+app.use('/api/auth', authRoutes)
 
 // Basic route for testing
 app.get('/', (req, res) => {
@@ -55,4 +58,4 @@ app.listen(PORT, async() => {
   }
 });
 
-module.exports = app;
+export default app;
