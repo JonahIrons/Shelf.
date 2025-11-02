@@ -1,14 +1,20 @@
-const { pool } = require('../config/db');
+import { pool } from '../config/db.js';
 
 //Will store a cached copy of the book so I don't query the API every time
 const booksTableQuery = `CREATE TABLE IF NOT EXISTS books (
                 id INT AUTO_INCREMENT PRIMARY KEY,
-                openlibrary_id VARCHAR(50) NOT NULL UNIQUE,
+                openlibrary_id VARCHAR(50) UNIQUE,
+                isbn VARCHAR(20),
                 title VARCHAR(255) NOT NULL,
                 author VARCHAR(255),
+                published_year INT,
                 cover_url VARCHAR(500),
                 description TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_author (author),
+                INDEX idx_title (title),
+                INDEX idx_published_year (published_year),
+                INDEX idx_isbn (isbn)
             );`
 
 //Table representing bookshelves of each user (Can have multiple)
@@ -18,7 +24,9 @@ const bookshelvesTableQuery = `CREATE TABLE IF NOT EXISTS bookshelves (
                 name VARCHAR(100) NOT NULL,
                 description VARCHAR(255),
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                INDEX idx_user_id (user_id)
             );`
 
 //Table representing many-to-many relationship between books and bookshelves
@@ -39,7 +47,11 @@ const reviewsTableQuery = `CREATE TABLE IF NOT EXISTS reviews (
                 review_text TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-                FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE
+                FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,
+                INDEX idx_user_id (user_id),
+                INDEX idx_book_id (book_id),
+                INDEX idx_rating (rating),
+                UNIQUE KEY unique_user_book_review (user_id, book_id)
             );`
 
 const userTableQuery = `CREATE TABLE IF NOT EXISTS users (
@@ -77,4 +89,4 @@ const createAllTable = async() => {
     }
 }
 
-module.exports = { createTable, createAllTable };
+export { createTable, createAllTable };

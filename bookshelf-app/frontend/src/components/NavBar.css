@@ -52,3 +52,18 @@
 .logo a:hover {
     color: var(--moss-green);
 }
+
+.nav-links a.user-name {
+    background-color: var(--moss-green);
+    border: none;
+    height: auto;
+    color: var(--pearl);
+    font-weight: 500;
+    padding: 8px 20px;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+.nav-links a.user-name:hover {
+    background-color: var(--light-bistre);
+}

@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Login.css'
-import axios from 'axios';
+import api from '../../utils/api';
 import { toast } from 'react-toastify';
+import { useAuth } from '../../context/AuthContext';
 
 export const Login = () => {
-
+    const navigate = useNavigate();
+    const { login } = useAuth();
+    
     const[formValues, setFormValues] = useState({
         username: '',
         password: ''
@@ -20,14 +23,21 @@ export const Login = () => {
         e.preventDefault();
         console.log(formValues);
         try {
-            const response = await axios.post("http://localhost:3001/api/auth/log-user", formValues);
+            const response = await api.post("/auth/log-user", formValues);
             console.log(response, 'res');
 
-            toast.success(response.data.message);
+            if (response.data.success && response.data.token) {
+                // Use auth context to store user data
+                login(response.data.user, response.data.token);
+
+                toast.success(response.data.message);
+                // Redirect to profile after successful login
+                navigate('/profile');
+            }
         }
         catch (error) {
             if (error.response) {
-                toast.error(error.response.data.message);
+                toast.error(error.response.data.message || 'Login failed');
             }
             else {
                 toast.error("Server unavailable. Please try again later.")
