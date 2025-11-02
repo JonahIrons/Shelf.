@@ -10,7 +10,7 @@
     align-items: center;
     margin-bottom: 3rem;
     padding-bottom: 2rem;
-    border-bottom: 2px solid #e0e0e0;
+    border-bottom: 2px solid var(--pearl);
 }
 
 .profile-info h1 {
@@ -69,7 +69,7 @@
 
 .bookshelf-card {
     padding: 1.5rem;
-    background: #f8f9fa;
+    background: var(--pearl);
     border: 1px solid #dee2e6;
     border-radius: 8px;
     transition: transform 0.2s, box-shadow 0.2s;
@@ -96,7 +96,7 @@
 .bookshelf-meta {
     margin-top: 1rem;
     padding-top: 1rem;
-    border-top: 1px solid #dee2e6;
+    border-top: 1px solid var(--pearl);
     color: #999;
     font-size: 0.85rem;
 }
@@ -128,8 +128,8 @@
 
 .action-card {
     padding: 1.5rem;
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
+    background: var(--pearl);
+    border: 1px solid var(--pearl);
     border-radius: 8px;
 }
 
