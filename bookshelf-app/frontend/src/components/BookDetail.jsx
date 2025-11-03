@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { AddToBookshelfModal } from './AddToBookshelf/AddToBookshelfModal';
 import './BookDetail.css';
 
 export const BookDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
+    const { isAuthenticated } = useAuth();
     const [book, setBook] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [showAddModal, setShowAddModal] = useState(false);
 
     useEffect(() => {
         console.log('BookDetail useEffect running');
@@ -63,8 +67,29 @@ export const BookDetail = () => {
                     <p>{book.published_year}</p>
                     <br></br>
                     <p>{book.description}</p>
+                    {isAuthenticated && (
+                        <div className="book-detail-actions">
+                            <button 
+                                onClick={() => setShowAddModal(true)}
+                                className="add-to-bookshelf-btn"
+                            >
+                                ➕ Add to Bookshelf
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
+
+            {showAddModal && (
+                <AddToBookshelfModal
+                    book={book}
+                    isOpen={showAddModal}
+                    onClose={() => setShowAddModal(false)}
+                    onSuccess={() => {
+                        // Could refresh book data or show success message
+                    }}
+                />
+            )}
         </div>
     );
 };

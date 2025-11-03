@@ -10,6 +10,7 @@ import { BookDetail } from './components/BookDetail';
 import { Login } from './components/LoginSignup/Login';
 import { SignUp } from './components/LoginSignup/SignUp';
 import { Profile } from './components/Profile/Profile';
+import { BookshelfManager } from './components/BookshelfManager/BookshelfManager';
 import { NavBar } from './components/NavBar';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
@@ -38,6 +39,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Profile />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/bookshelves" 
+              element={
+                <ProtectedRoute>
+                  <BookshelfManager />
                 </ProtectedRoute>
               } 
             />

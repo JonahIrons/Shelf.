@@ -86,6 +86,30 @@
     margin-bottom: 1rem;
 }
 
+.book-detail-actions {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--pearl);
+}
+
+.add-to-bookshelf-btn {
+    background-color: var(--moss-green);
+    color: var(--pearl);
+    border: 2px solid var(--moss-green);
+    padding: 12px 24px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.add-to-bookshelf-btn:hover {
+    background-color: var(--light-bistre);
+    color: var(--moss-green);
+    border-color: var(--moss-green);
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
     .book-detail-container {

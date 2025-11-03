@@ -73,6 +73,119 @@ const createTable = async(tableName, query) => {
     }
 }
 
+// Migration function to add missing columns to existing tables
+const migrateBooksTable = async () => {
+    try {
+        // Check and add isbn column if it doesn't exist
+        try {
+            await pool.query(`
+                ALTER TABLE books 
+                ADD COLUMN IF NOT EXISTS isbn VARCHAR(20)
+            `);
+            console.log('Books table: isbn column verified');
+        } catch (error) {
+            // MySQL doesn't support IF NOT EXISTS for columns, so we'll use a different approach
+            const [columns] = await pool.query(`
+                SELECT COLUMN_NAME 
+                FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_SCHEMA = DATABASE() 
+                AND TABLE_NAME = 'books' 
+                AND COLUMN_NAME = 'isbn'
+            `);
+            if (columns.length === 0) {
+                await pool.query(`ALTER TABLE books ADD COLUMN isbn VARCHAR(20)`);
+                console.log('Books table: Added isbn column');
+            }
+        }
+
+        // Check and add published_year column if it doesn't exist
+        try {
+            const [columns] = await pool.query(`
+                SELECT COLUMN_NAME 
+                FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_SCHEMA = DATABASE() 
+                AND TABLE_NAME = 'books' 
+                AND COLUMN_NAME = 'published_year'
+            `);
+            if (columns.length === 0) {
+                await pool.query(`ALTER TABLE books ADD COLUMN published_year INT`);
+                console.log('Books table: Added published_year column');
+            }
+        } catch (error) {
+            console.log('Error checking published_year column:', error);
+        }
+
+        // Check and add indexes if they don't exist
+        try {
+            const [indexes] = await pool.query(`
+                SELECT INDEX_NAME 
+                FROM INFORMATION_SCHEMA.STATISTICS 
+                WHERE TABLE_SCHEMA = DATABASE() 
+                AND TABLE_NAME = 'books' 
+                AND INDEX_NAME = 'idx_isbn'
+            `);
+            if (indexes.length === 0 && await columnExists('books', 'isbn')) {
+                await pool.query(`CREATE INDEX idx_isbn ON books(isbn)`);
+                console.log('Books table: Added idx_isbn index');
+            }
+        } catch (error) {
+            // Index might already exist, ignore
+        }
+
+        try {
+            const [indexes] = await pool.query(`
+                SELECT INDEX_NAME 
+                FROM INFORMATION_SCHEMA.STATISTICS 
+                WHERE TABLE_SCHEMA = DATABASE() 
+                AND TABLE_NAME = 'books' 
+                AND INDEX_NAME = 'idx_published_year'
+            `);
+            if (indexes.length === 0 && await columnExists('books', 'published_year')) {
+                await pool.query(`CREATE INDEX idx_published_year ON books(published_year)`);
+                console.log('Books table: Added idx_published_year index');
+            }
+        } catch (error) {
+            // Index might already exist, ignore
+        }
+
+        // Check and add updated_at to bookshelves if needed
+        try {
+            const [columns] = await pool.query(`
+                SELECT COLUMN_NAME 
+                FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_SCHEMA = DATABASE() 
+                AND TABLE_NAME = 'bookshelves' 
+                AND COLUMN_NAME = 'updated_at'
+            `);
+            if (columns.length === 0) {
+                await pool.query(`ALTER TABLE bookshelves ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`);
+                console.log('Bookshelves table: Added updated_at column');
+            }
+        } catch (error) {
+            console.log('Error checking updated_at column:', error);
+        }
+
+    } catch (error) {
+        console.log('Migration error (this is okay if columns already exist):', error.message);
+    }
+};
+
+// Helper function to check if a column exists
+const columnExists = async (tableName, columnName) => {
+    try {
+        const [columns] = await pool.query(`
+            SELECT COLUMN_NAME 
+            FROM INFORMATION_SCHEMA.COLUMNS 
+            WHERE TABLE_SCHEMA = DATABASE() 
+            AND TABLE_NAME = ? 
+            AND COLUMN_NAME = ?
+        `, [tableName, columnName]);
+        return columns.length > 0;
+    } catch (error) {
+        return false;
+    }
+};
+
 const createAllTable = async() => {
     try {
         await createTable('Users', userTableQuery);
@@ -80,6 +193,9 @@ const createAllTable = async() => {
         await createTable('Bookshelves', bookshelvesTableQuery);
         await createTable('Bookshelf_Books', bookshelf_booksTableQuery);
         await createTable('Reviews', reviewsTableQuery);
+
+        // Run migrations to add any missing columns to existing tables
+        await migrateBooksTable();
 
         console.log("All tables created successfully!");
     }

@@ -131,6 +131,19 @@
     background: var(--pearl);
     border: 1px solid var(--pearl);
     border-radius: 8px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    display: block;
+    color: inherit;
+}
+
+.action-card.clickable {
+    cursor: pointer;
+}
+
+.action-card.clickable:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .action-card h3 {
@@ -150,6 +163,13 @@
     font-style: italic;
     color: #999;
     font-size: 0.85rem !important;
+}
+
+.action-link {
+    margin-top: 1rem !important;
+    color: var(--moss-green) !important;
+    font-weight: 500;
+    font-size: 0.9rem !important;
 }
 
 @media (max-width: 768px) {

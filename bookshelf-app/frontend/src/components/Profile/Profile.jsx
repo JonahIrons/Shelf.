@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../utils/api';
 import './Profile.css';
@@ -87,11 +88,11 @@ export const Profile = () => {
                 <section className="profile-section">
                     <h2>Quick Actions</h2>
                     <div className="actions-grid">
-                        <div className="action-card">
+                        <Link to="/bookshelves" className="action-card clickable">
                             <h3>📚 Manage Bookshelves</h3>
                             <p>Create, edit, and organize your bookshelves</p>
-                            <p className="coming-soon">Coming soon...</p>
-                        </div>
+                            <p className="action-link">Click to manage →</p>
+                        </Link>
                         <div className="action-card">
                             <h3>📊 View Reports</h3>
                             <p>Generate reports on your reading statistics</p>
