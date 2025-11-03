@@ -101,39 +101,43 @@ export const generateBookReport = async (req, res) => {
         const booksParams = [...queryParams, ...havingParams, parseInt(limit), parseInt(offset)];
         const [books] = await pool.query(booksQuery, booksParams);
 
-        // Calculate statistics - simpler approach
-        // First get base filtered books for stats
+        // Calculate statistics - build query with correct parameter order
         let statsWhereConditions = [];
-        const statsParams = [userId];
+        const statsWhereParams = [];
 
+        // Build WHERE conditions and params in the correct order
         if (bookshelf_id) {
             statsWhereConditions.push('bb.bookshelf_id = ?');
-            statsParams.push(bookshelf_id);
+            statsWhereParams.push(parseInt(bookshelf_id)); // Ensure it's an integer
             statsWhereConditions.push('bs.user_id = ?');
-            statsParams.push(userId);
+            statsWhereParams.push(userId);
         } else {
             statsWhereConditions.push('bs.user_id = ?');
-            statsParams.push(userId);
+            statsWhereParams.push(userId);
         }
 
         if (author) {
             statsWhereConditions.push('b.author LIKE ?');
-            statsParams.push(`%${author}%`);
+            statsWhereParams.push(`%${author}%`);
         }
         if (year_from) {
             statsWhereConditions.push('b.published_year >= ?');
-            statsParams.push(parseInt(year_from));
+            statsWhereParams.push(parseInt(year_from));
         }
         if (year_to) {
             statsWhereConditions.push('b.published_year <= ?');
-            statsParams.push(parseInt(year_to));
+            statsWhereParams.push(parseInt(year_to));
         }
 
         const statsWhereClause = statsWhereConditions.length > 0
             ? `WHERE ${statsWhereConditions.join(' AND ')}`
             : '';
 
-        // Statistics query
+        // Statistics query - parameters used in order:
+        // 1. userId (for avg_books_per_bookshelf subquery)
+        // 2. userId (for reviews LEFT JOIN)
+        // 3. userId (for book_ratings subquery)
+        // 4. ...statsWhereParams (for WHERE clause - comes LAST!)
         const statsQuery = `
             SELECT 
                 COUNT(DISTINCT b.id) as total_books,
@@ -167,8 +171,23 @@ export const generateBookReport = async (req, res) => {
             ${statsWhereClause}
         `;
 
-        const finalStatsParams = [userId, ...statsParams, userId];
+        // Build final parameter array in the exact order needed by the query
+        // Order: userId (subquery), userId (reviews), userId (book_ratings), ...statsWhereParams (WHERE clause)
+        const finalStatsParams = [userId, userId, userId, ...statsWhereParams];
         const [stats] = await pool.query(statsQuery, finalStatsParams);
+
+        // Count total bookshelves separately (including empty ones)
+        let bookshelfCountQuery = 'SELECT COUNT(*) as total FROM bookshelves WHERE user_id = ?';
+        let bookshelfCountParams = [userId];
+        
+        // If filtering by specific bookshelf, only count that one
+        if (bookshelf_id) {
+            bookshelfCountQuery = 'SELECT COUNT(*) as total FROM bookshelves WHERE user_id = ? AND id = ?';
+            bookshelfCountParams = [userId, bookshelf_id];
+        }
+        
+        const [bookshelfCount] = await pool.query(bookshelfCountQuery, bookshelfCountParams);
+        const totalBookshelves = parseInt(bookshelfCount[0].total || 0);
 
         // Get available filter options for the UI
         const [bookshelves] = await pool.query(
@@ -219,7 +238,7 @@ export const generateBookReport = async (req, res) => {
             },
             statistics: {
                 total_books: parseInt(stats[0].total_books || 0),
-                total_bookshelves: parseInt(stats[0].total_bookshelves || 0),
+                total_bookshelves: totalBookshelves,
                 avg_books_per_bookshelf: stats[0].avg_books_per_bookshelf 
                     ? parseFloat(stats[0].avg_books_per_bookshelf).toFixed(2) 
                     : '0.00',

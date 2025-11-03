@@ -11,6 +11,7 @@ import { Login } from './components/LoginSignup/Login';
 import { SignUp } from './components/LoginSignup/SignUp';
 import { Profile } from './components/Profile/Profile';
 import { BookshelfManager } from './components/BookshelfManager/BookshelfManager';
+import { Reports } from './components/Reports/Reports';
 import { NavBar } from './components/NavBar';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
@@ -47,6 +48,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <BookshelfManager />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/reports" 
+              element={
+                <ProtectedRoute>
+                  <Reports />
                 </ProtectedRoute>
               } 
             />

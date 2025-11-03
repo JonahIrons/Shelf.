@@ -93,11 +93,11 @@ export const Profile = () => {
                             <p>Create, edit, and organize your bookshelves</p>
                             <p className="action-link">Click to manage →</p>
                         </Link>
-                        <div className="action-card">
+                        <Link to="/reports" className="action-card clickable">
                             <h3>📊 View Reports</h3>
                             <p>Generate reports on your reading statistics</p>
-                            <p className="coming-soon">Coming soon...</p>
-                        </div>
+                            <p className="action-link">Click to view →</p>
+                        </Link>
                         <div className="action-card">
                             <h3>⭐ Write Reviews</h3>
                             <p>Rate and review the books you've read</p>
