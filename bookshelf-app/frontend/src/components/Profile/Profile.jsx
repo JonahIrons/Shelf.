@@ -89,20 +89,20 @@ export const Profile = () => {
                     <h2>Quick Actions</h2>
                     <div className="actions-grid">
                         <Link to="/bookshelves" className="action-card clickable">
-                            <h3>📚 Manage Bookshelves</h3>
+                            <h3>Manage Bookshelves</h3>
                             <p>Create, edit, and organize your bookshelves</p>
                             <p className="action-link">Click to manage →</p>
                         </Link>
                         <Link to="/reports" className="action-card clickable">
-                            <h3>📊 View Reports</h3>
+                            <h3>View Reports</h3>
                             <p>Generate reports on your reading statistics</p>
                             <p className="action-link">Click to view →</p>
                         </Link>
-                        <div className="action-card">
-                            <h3>⭐ Write Reviews</h3>
+                        <Link to="/reviews" className="action-card clickable">
+                            <h3>Manage Reviews</h3>
                             <p>Rate and review the books you've read</p>
-                            <p className="coming-soon">Coming soon...</p>
-                        </div>
+                            <p className="action-link">Click to manage →</p>
+                        </Link>
                     </div>
                 </section>
             </div>

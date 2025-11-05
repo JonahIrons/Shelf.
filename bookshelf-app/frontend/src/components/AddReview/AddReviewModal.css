@@ -1,0 +1,254 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: var(--light-bistre);
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--pearl);
+}
+
+.modal-header h2 {
+    margin: 0;
+    color: var(--moss-green);
+    font-size: 1.5rem;
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--pearl);
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.modal-close-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.book-info {
+    padding: 1rem;
+    background: var(--pearl);
+    border-radius: 8px;
+    border: 1px solid var(--bistre);
+}
+
+.book-info h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--bistre);
+    font-size: 1.2rem;
+}
+
+.book-info p {
+    margin: 0;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.bookshelf-select {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.bookshelf-select label {
+    color: var(--pearl);
+    font-weight: 500;
+}
+
+.bookshelf-dropdown {
+    padding: 0.75rem;
+    border: 2px solid var(--bistre);
+    border-radius: 6px;
+    background: var(--pearl);
+    color: var(--bistre);
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.bookshelf-dropdown:focus {
+    outline: none;
+    border-color: var(--moss-green);
+}
+
+.rating-select {
+    padding: 0.75rem;
+    border: 2px solid var(--bistre);
+    border-radius: 6px;
+    background: var(--pearl);
+    color: var(--bistre);
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.rating-select:focus {
+    outline: none;
+    border-color: var(--moss-green);
+}
+
+.review-textarea {
+    padding: 0.75rem;
+    border: 2px solid var(--bistre);
+    border-radius: 6px;
+    background: var(--pearl);
+    color: var(--bistre);
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 120px;
+}
+
+.review-textarea:focus {
+    outline: none;
+    border-color: var(--moss-green);
+}
+
+.no-bookshelves {
+    color: #999;
+    font-style: italic;
+    padding: 0.5rem;
+}
+
+.create-bookshelf-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.create-bookshelf-form h3 {
+    margin: 0 0 1rem 0;
+    color: var(--moss-green);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    color: var(--pearl);
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+    padding: 0.75rem;
+    border: 2px solid var(--bistre);
+    border-radius: 6px;
+    background: var(--pearl);
+    color: var(--bistre);
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--moss-green);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-primary {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--moss-green);
+    color: var(--pearl);
+    border: 2px solid var(--moss-green);
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: var(--light-bistre);
+    border-color: var(--moss-green);
+    color: var(--moss-green);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    padding: 0.75rem 1.5rem;
+    background-color: transparent;
+    color: var(--pearl);
+    border: 2px solid var(--pearl);
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-secondary:hover {
+    background-color: var(--pearl);
+    color: var(--bistre);
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+    .modal-content {
+        padding: 1.5rem;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+    }
+}
+

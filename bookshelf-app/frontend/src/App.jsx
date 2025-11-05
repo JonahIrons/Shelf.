@@ -13,6 +13,7 @@ import { Profile } from './components/Profile/Profile';
 import { BookshelfManager } from './components/BookshelfManager/BookshelfManager';
 import { Reports } from './components/Reports/Reports';
 import { NavBar } from './components/NavBar';
+import { ReviewsManager } from './components/Reviews/ReviewsManager';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 
@@ -56,6 +57,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Reports />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/reviews" 
+              element={
+                <ProtectedRoute>
+                  <ReviewsManager />
                 </ProtectedRoute>
               } 
             />

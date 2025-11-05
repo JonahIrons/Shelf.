@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { AddToBookshelfModal } from './AddToBookshelf/AddToBookshelfModal';
+import { AddReviewModal } from './AddReview/AddReviewModal';
 import './BookDetail.css';
 
 export const BookDetail = () => {
@@ -12,6 +13,7 @@ export const BookDetail = () => {
     const [book, setBook] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showAddModal, setShowAddModal] = useState(false);
+    const [showReviewModal, setShowReviewModal] = useState(false);
 
     useEffect(() => {
         console.log('BookDetail useEffect running');
@@ -75,6 +77,12 @@ export const BookDetail = () => {
                             >
                                 ➕ Add to Bookshelf
                             </button>
+                            <button
+                                onClick={() => setShowReviewModal(true)}
+                                className="add-review-btn"
+                            >
+                                ➕ Add Review
+                            </button>
                         </div>
                     )}
                 </div>
@@ -88,6 +96,14 @@ export const BookDetail = () => {
                     onSuccess={() => {
                         // Could refresh book data or show success message
                     }}
+                />
+            )}
+
+            {showReviewModal && (
+                <AddReviewModal
+                    book={book}
+                    isOpen={showReviewModal}
+                    onClose={() => setShowReviewModal(false)}
                 />
             )}
         </div>

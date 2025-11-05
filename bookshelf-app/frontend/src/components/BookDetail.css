@@ -102,9 +102,28 @@
     border-radius: 5px;
     transition: all 0.3s ease;
     font-weight: 600;
+    margin-right: 1rem;
 }
 
 .add-to-bookshelf-btn:hover {
+    background-color: var(--light-bistre);
+    color: var(--moss-green);
+    border-color: var(--moss-green);
+}
+
+.add-review-btn {
+    background-color: var(--moss-green);
+    color: var(--pearl);
+    border: 2px solid var(--moss-green);
+    padding: 12px 24px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.add-review-btn:hover {
     background-color: var(--light-bistre);
     color: var(--moss-green);
     border-color: var(--moss-green);

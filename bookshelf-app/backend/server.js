@@ -18,12 +18,14 @@ app.use(express.urlencoded({ extended: true }));
 import booksRoutes from './routes/books.js';
 import bookshelfRoutes from './routes/bookshelves.js';
 import reportRoutes from './routes/reports.js';
+import reviewRoutes from './routes/reviews.js';
 
 // API Routes
 app.use('/api/books', booksRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/bookshelves', bookshelfRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 // Basic route for testing
 app.get('/', (req, res) => {
