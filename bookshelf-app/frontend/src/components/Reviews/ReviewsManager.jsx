@@ -19,8 +19,8 @@ export const ReviewsManager = () => {
     const [createBookTitle, setCreateBookTitle] = useState('');
     const [createBookAuthor, setCreateBookAuthor] = useState('');
     const [createBookYear, setCreateBookYear] = useState('');
-    //const [createBookIsbn, setCreateBookIsbn] = useState('');
-    //const [createBookCover, setCreateBookCover] = useState('');
+    const [createBookIsbn, setCreateBookIsbn] = useState('');
+    const [createBookCover, setCreateBookCover] = useState('');
 
     // inline edit state
     const [editingId, setEditingId] = useState(null);
@@ -66,8 +66,8 @@ export const ReviewsManager = () => {
                     title: createBookTitle,
                     author: createBookAuthor || null,
                     published_year: createBookYear ? parseInt(createBookYear) : null,
-                    //isbn: createBookIsbn || null,
-                    //cover_url: createBookCover || null,
+                    isbn: createBookIsbn || null,
+                    cover_url: createBookCover || null,
                 };
             }
             const res = await api.post('/reviews', body);
@@ -80,8 +80,8 @@ export const ReviewsManager = () => {
                 setCreateBookTitle('');
                 setCreateBookAuthor('');
                 setCreateBookYear('');
-                //setCreateBookIsbn('');
-                //setCreateBookCover('');
+                setCreateBookIsbn('');
+                setCreateBookCover('');
                 await loadReviews();
             }
         } catch (e) {
@@ -170,6 +170,14 @@ export const ReviewsManager = () => {
                             <div className="form-group">
                                 <label>Year</label>
                                 <input type="number" value={createBookYear} onChange={e => setCreateBookYear(e.target.value)} placeholder="e.g. 1949" />
+                            </div>
+                            <div className="form-group">
+                                <label>ISBN</label>
+                                <input type="text" value={createBookIsbn} onChange={e => setCreateBookIsbn(e.target.value)} placeholder="Optional" />
+                            </div>
+                            <div className="form-group">
+                                <label>Cover URL</label>
+                                <input type="text" value={createBookCover} onChange={e => setCreateBookCover(e.target.value)} placeholder="https://..." />
                             </div>
                         </div>
                     </div>

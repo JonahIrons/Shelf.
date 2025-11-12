@@ -21,7 +21,7 @@ export const SignUp = () => {
 
     const handleSubmit = async(e) => {
         e.preventDefault();
-        console.log(formValues);
+        
         try {
             const response = await api.post("/auth/register-user", formValues);
             console.log(response, 'res');

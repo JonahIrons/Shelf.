@@ -84,7 +84,7 @@ const migrateBooksTable = async () => {
             `);
             console.log('Books table: isbn column verified');
         } catch (error) {
-            // MySQL doesn't support IF NOT EXISTS for columns, so we'll use a different approach
+            // MySQL doesn't support IF NOT EXISTS for columns, so this is a workaround.
             const [columns] = await pool.query(`
                 SELECT COLUMN_NAME 
                 FROM INFORMATION_SCHEMA.COLUMNS 

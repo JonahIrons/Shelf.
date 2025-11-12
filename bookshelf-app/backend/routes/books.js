@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-// Mock data for now - we'll replace this with database calls later
+// Temporary mock data - will use db eventually
 const mockBooks = [
     {
         id: 1,
