@@ -1,7 +1,5 @@
 //Validation done in controller
 
-import UserModel from "../models/userModel.js";
-import { registerUser } from "../services/authService.js";
 import { pool } from '../config/db.js';
 import bcrypt from 'bcrypt';
 import { generateToken } from '../utils/jwt.js';
@@ -14,49 +12,107 @@ export const register = async(req, res) => {
         return res.status(400).json({success: false, message: "All fields are required"});
     }
 
-    //Check if username already exists
-    const [existingUser] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
-    if (existingUser.length > 0) {
-        return res.status(400).json({success: false, message: 'Username already in use!'});
-    }
-
-    //Check if email already exists
-    const [existingEmail] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
-    if (existingEmail.length > 0) {
-        return res.status(400).json({success: false, message: 'Email already in use!'});
-    }
-
-    const user = new UserModel({username, email, password});
-
+    // Get a connection from the pool for transaction
+    const connection = await pool.getConnection();
+    
     try {
-        const response = await registerUser(user);
+        // Begin transaction (uses default isolation level - REPEATABLE READ)
+        // For SERIALIZABLE, we can set it per-transaction if needed, but default is usually sufficient
+        await connection.beginTransaction();
 
-        if (response.success) {
-            // Get the newly created user to generate token
-            const [newUsers] = await pool.query('SELECT id, username, email FROM users WHERE username = ?', [username]);
-            const newUser = newUsers[0];
-            
-            // Generate JWT token
-            const token = generateToken(newUser);
-            
-            return res.status(200).json({
-                success: true,
-                message: "User Registered Successfully!",
-                token: token,
-                user: {
-                    id: newUser.id,
-                    username: newUser.username,
-                    email: newUser.email
-                }
-            });
+        // Check if username already exists
+        // Note: FOR UPDATE only works if rows exist, so we check first
+        const [existingUser] = await connection.query(
+            'SELECT * FROM users WHERE username = ?',
+            [username]
+        );
+        if (existingUser.length > 0) {
+            await connection.rollback();
+            connection.release();
+            return res.status(400).json({success: false, message: 'Username already in use!'});
         }
-        else {
-            return res.status(400).json(response);
+
+        // Check if email already exists
+        const [existingEmail] = await connection.query(
+            'SELECT * FROM users WHERE email = ?',
+            [email]
+        );
+        if (existingEmail.length > 0) {
+            await connection.rollback();
+            connection.release();
+            return res.status(400).json({success: false, message: 'Email already in use!'});
         }
+
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Insert new user (all within the same transaction)
+        const [result] = await connection.query(
+            'INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)',
+            [username, email, hashedPassword]
+        );
+
+        // Commit the transaction - all operations succeed together
+        await connection.commit();
+
+        // Get the newly created user (using insertId from the INSERT result)
+        const newUser = {
+            id: result.insertId,
+            username: username,
+            email: email
+        };
+        
+        // Generate JWT token
+        const token = generateToken(newUser);
+        
+        // Release connection and return success
+        connection.release();
+        return res.status(200).json({
+            success: true,
+            message: "User Registered Successfully!",
+            token: token,
+            user: {
+                id: newUser.id,
+                username: newUser.username,
+                email: newUser.email
+            }
+        });
     }
     catch (error) {
+        // Rollback transaction on any error
+        try {
+            await connection.rollback();
+        } catch (rollbackError) {
+            console.error('Rollback error:', rollbackError);
+        }
+        
+        // Always release connection
+        try {
+            connection.release();
+        } catch (releaseError) {
+            console.error('Connection release error:', releaseError);
+        }
+        
         console.error('Registration error:', error);
-        return res.status(500).json({success: false, message: "Registration failed."});
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+        
+        // Check if it's a duplicate entry error (MySQL unique constraint violation)
+        if (error.code === 'ER_DUP_ENTRY') {
+            return res.status(400).json({
+                success: false,
+                message: error.message.includes('username') 
+                    ? 'Username already in use!' 
+                    : 'Email already in use!'
+            });
+        }
+        
+        return res.status(500).json({
+            success: false,
+            message: "Registration failed. Please try again later.",
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 
     //Can add email / password format validation here as well
