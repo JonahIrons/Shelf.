@@ -15,13 +15,13 @@ export const register = async(req, res) => {
     // Get a connection from the pool for transaction
     const connection = await pool.getConnection();
     
+
+    // Transaction for user registration, ensuring two users cannot register at the same time with the same username/email.
     try {
-        // Begin transaction (uses default isolation level - REPEATABLE READ)
-        // For SERIALIZABLE, we can set it per-transaction if needed, but default is usually sufficient
+        //Transaction uses MySQL default isolation level (REPEATABLE READ)
         await connection.beginTransaction();
 
         // Check if username already exists
-        // Note: FOR UPDATE only works if rows exist, so we check first
         const [existingUser] = await connection.query(
             'SELECT * FROM users WHERE username = ?',
             [username]
@@ -46,16 +46,16 @@ export const register = async(req, res) => {
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Insert new user (all within the same transaction)
+        // Insert new user
         const [result] = await connection.query(
             'INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)',
             [username, email, hashedPassword]
         );
 
-        // Commit the transaction - all operations succeed together
+        // Commit transaction
         await connection.commit();
 
-        // Get the newly created user (using insertId from the INSERT result)
+        // Get newly created user
         const newUser = {
             id: result.insertId,
             username: username,
