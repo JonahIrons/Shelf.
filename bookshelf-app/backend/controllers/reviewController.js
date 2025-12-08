@@ -62,40 +62,106 @@ export const createReview = async (req, res) => {
 };
 
 // PUT /api/reviews/:id - update rating/text of a review owned by the user
+// Transaction prevents concurrent modifications if reviews are made public in the future
 export const updateReview = async (req, res) => {
-    try {
-        const userId = req.user.id;
-        const { id } = req.params;
-        const { rating, review_text } = req.body;
+    const userId = req.user.id;
+    const { id } = req.params;
+    const { rating, review_text } = req.body;
 
-        const [rows] = await pool.query('SELECT * FROM reviews WHERE id = ? AND user_id = ?', [id, userId]);
+    // Validate input
+    if (rating !== undefined && (rating < 1 || rating > 10)) {
+        return res.status(400).json({ success: false, message: 'Rating must be 1-10' });
+    }
+
+    // Build update fields
+    const updates = [];
+    const params = [];
+    if (rating !== undefined) {
+        updates.push('rating = ?');
+        params.push(rating);
+    }
+    if (review_text !== undefined) {
+        updates.push('review_text = ?');
+        params.push(review_text || null);
+    }
+    if (updates.length === 0) {
+        return res.status(400).json({ success: false, message: 'No fields to update' });
+    }
+
+    // Get a connection from the pool for transaction
+    const connection = await pool.getConnection();
+
+    try {
+        // Utilize default REPEATABLE READ isolation level
+        await connection.beginTransaction();
+
+        // Verify ownership and lock the review row
+        const [rows] = await connection.query(
+            'SELECT * FROM reviews WHERE id = ? AND user_id = ? FOR UPDATE',
+            [id, userId]
+        );
+
         if (rows.length === 0) {
+            await connection.rollback();
+            connection.release();
             return res.status(404).json({ success: false, message: 'Review not found' });
         }
 
-        const updates = [];
-        const params = [];
-        if (rating !== undefined) {
-            if (rating < 1 || rating > 10) {
-                return res.status(400).json({ success: false, message: 'Rating must be 1-10' });
+        const currentReview = rows[0];
+
+        // Perform the update within transaction
+        params.push(id, userId);
+        await connection.query(
+            `UPDATE reviews SET ${updates.join(', ')} WHERE id = ? AND user_id = ?`,
+            params
+        );
+
+        // Commit the transaction
+        await connection.commit();
+
+        // Release connection and return success
+        connection.release();
+        res.status(200).json({ 
+            success: true, 
+            message: 'Review updated',
+            review: {
+                id: parseInt(id),
+                rating: rating !== undefined ? rating : currentReview.rating,
+                review_text: review_text !== undefined ? review_text : currentReview.review_text
             }
-            updates.push('rating = ?');
-            params.push(rating);
-        }
-        if (review_text !== undefined) {
-            updates.push('review_text = ?');
-            params.push(review_text || null);
-        }
-        if (updates.length === 0) {
-            return res.status(400).json({ success: false, message: 'No fields to update' });
+        });
+    } catch (error) {
+        // Rollback transaction on any error
+        try {
+            await connection.rollback();
+        } catch (rollbackError) {
+            console.error('Rollback error:', rollbackError);
         }
 
-        params.push(id, userId);
-        await pool.query(`UPDATE reviews SET ${updates.join(', ')} WHERE id = ? AND user_id = ?`, params);
-        res.status(200).json({ success: true, message: 'Review updated' });
-    } catch (error) {
+        // Always release connection
+        try {
+            connection.release();
+        } catch (releaseError) {
+            console.error('Connection release error:', releaseError);
+        }
+
         console.error('Update review error:', error);
-        res.status(500).json({ success: false, message: 'Failed to update review' });
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
+
+        // Check for specific database errors
+        if (error.code === 'ER_LOCK_WAIT_TIMEOUT') {
+            return res.status(409).json({
+                success: false,
+                message: 'Review is currently being updated by another process. Please try again.'
+            });
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to update review',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 };
 
